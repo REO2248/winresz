@@ -72,7 +72,44 @@ impl Display for Size {
     }
 }
 
+fn get_resolution_by_name(name: &str) -> Option<Size> {
+    match name.to_ascii_lowercase().as_str() {
+        "vga" => Some(Size { x: 640, y: 480 }),
+        "svga" => Some(Size { x: 800, y: 600 }),
+        "xga" => Some(Size { x: 1024, y: 768 }),
+        "sxga" => Some(Size { x: 1280, y: 1024 }),
+        "uxga" => Some(Size { x: 1600, y: 1200 }),
+        "hd" => Some(Size { x: 1280, y: 720 }),
+        "fhd" => Some(Size { x: 1920, y: 1080 }),
+        "wqhd" => Some(Size { x: 2560, y: 1440 }),
+        "4k" | "uhd" => Some(Size { x: 3840, y: 2160 }),
+        "8k" => Some(Size { x: 7680, y: 4320 }),
+        "wxga" => Some(Size { x: 1280, y: 800 }),
+        "wsxga+" | "wsxga" => Some(Size { x: 1680, y: 1050 }),
+        "wuxga" => Some(Size { x: 1920, y: 1200 }),
+        "wqxga" => Some(Size { x: 2560, y: 1600 }),
+        "wquxga" => Some(Size { x: 3840, y: 2400 }),
+        "uwfhd" | "ultrawide" => Some(Size { x: 2560, y: 1080 }),
+        "uwqhd" | "ultrawide1440" => Some(Size { x: 3440, y: 1440 }),
+        "uw4k" | "ultrawide4k" => Some(Size { x: 5120, y: 2160 }),
+        "dci4k" => Some(Size { x: 4096, y: 2160 }),
+        _ => None,
+    }
+}
+
 fn parse_size(arg: &str) -> Result<Size, Error> {
+    if let Some(size) = get_resolution_by_name(arg) {
+        return Ok(size);
+    }
+
+    if arg.ends_with('p') || arg.ends_with('P') {
+        let height_str = &arg[..arg.len() - 1];
+        if let Ok(height) = height_str.parse::<usize>() {
+            let width = (height * 16 + 8) / 9;
+            return Ok(Size { x: width, y: height });
+        }
+    }
+
     let mut res = arg.split('x');
 
     let Some(x) = res.next() else {
