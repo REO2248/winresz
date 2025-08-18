@@ -6,8 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-winsafe = { version = "0.0.25", features = ["user", "kernel"] }
+winsafe = { version = "0.0.25", features = ["user", "kernel", "dwm"] }
 clap = { version = "4.5.4", features = ["derive"] }
+windows-sys = { version = "0.59.0", features = ["Win32_Graphics_Dwm"] }
 
 [profile.release]
 opt-level = "z"

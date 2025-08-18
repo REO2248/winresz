@@ -4,6 +4,24 @@ use std::io::{Error, ErrorKind};
 use std::ops::{Add, Sub};
 use winsafe::{RECT, SIZE};
 
+#[derive(Debug, Copy, Clone)]
+pub enum CornerPreference {
+    Default,
+    DoNotRound,
+    Round,
+    RoundSmall,
+}
+
+fn parse_corner(arg: &str) -> Result<CornerPreference, String> {
+    match arg.to_ascii_uppercase().as_str() {
+        "DEFAULT" | "0" => Ok(CornerPreference::Default),
+        "DONOTROUND" | "1" => Ok(CornerPreference::DoNotRound),
+        "ROUND" | "2" => Ok(CornerPreference::Round),
+        "ROUNDSMALL" | "3" => Ok(CornerPreference::RoundSmall),
+        _ => Err("Invalid corner value. Use one of: DEFAULT, DONOTROUND, ROUND, ROUNDSMALL or 0-3.".into()),
+    }
+}
+
 #[derive(Debug, Clone, Args)]
 pub struct TargetInformation {
     #[arg(short, long, help = "Filter by binary path")]
@@ -20,6 +38,8 @@ pub struct Cli {
     pub target: TargetInformation,
     #[arg(value_parser = parse_size, help = "Set the window size if it's set.")]
     pub size: Option<Size>,
+    #[arg(short = 'c', long = "corner", value_parser = parse_corner, help = "Set DWM window corner preference (DEFAULT|DONOTROUND|ROUND|ROUNDSMALL or 0-3)")]
+    pub corner: Option<CornerPreference>,
 }
 
 #[derive(Debug, Copy, Clone, Parser, Default)]

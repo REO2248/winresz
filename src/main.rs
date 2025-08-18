@@ -3,6 +3,7 @@ use winsafe::{
     co::{PROCESS, PROCESS_NAME, SWP},
     EnumWindows, HwndPlace, HPROCESS, HWND, POINT,
 };
+use windows_sys::Win32::Graphics::Dwm::{DwmSetWindowAttribute, DWMWA_WINDOW_CORNER_PREFERENCE, DWM_WINDOW_CORNER_PREFERENCE, DWMWCP_DEFAULT, DWMWCP_DONOTROUND, DWMWCP_ROUND, DWMWCP_ROUNDSMALL};
 
 mod model;
 use model::*;
@@ -49,6 +50,24 @@ fn window_callback(hwnd: HWND, op: &Cli) {
     }
 
     let client_size = Size::from(hwnd.GetClientRect().unwrap());
+
+    if let Some(corner) = op.corner.as_ref() {
+        let pref: DWM_WINDOW_CORNER_PREFERENCE = match corner {
+            CornerPreference::Default => DWMWCP_DEFAULT,
+            CornerPreference::DoNotRound => DWMWCP_DONOTROUND,
+            CornerPreference::Round => DWMWCP_ROUND,
+            CornerPreference::RoundSmall => DWMWCP_ROUNDSMALL,
+        } as _;
+
+        unsafe {
+            let _ = DwmSetWindowAttribute(
+                hwnd.ptr() as _,
+                DWMWA_WINDOW_CORNER_PREFERENCE as u32,
+                &pref as *const _ as _,
+                std::mem::size_of::<DWM_WINDOW_CORNER_PREFERENCE>() as u32,
+            );
+        }
+    }
 
     let Some(size) = op.size else {
         println!("{}\t", client_size - op.target.offset);

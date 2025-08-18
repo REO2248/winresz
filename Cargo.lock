@@ -241,6 +241,7 @@ name = "winresz"
 version = "0.1.2"
 dependencies = [
  "clap",
+ "windows-sys",
  "winsafe",
 ]
 
