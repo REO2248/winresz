@@ -4,6 +4,29 @@ use std::io::{Error, ErrorKind};
 use std::ops::{Add, Sub};
 use winsafe::{RECT, SIZE};
 
+fn parse_on_off(arg: &str) -> Result<bool, String> {
+    match arg.to_ascii_lowercase().as_str() {
+        "on" | "true" | "1" => Ok(true),
+        "off" | "false" | "0" => Ok(false),
+        _ => Err("Invalid value. Use: on|off|true|false|1|0".into()),
+    }
+}
+
+fn parse_color(arg: &str) -> Result<u32, String> {
+    let s = arg.trim();
+    let s = s.strip_prefix('#').unwrap_or(s);
+    if s.len() != 6 || !s.chars().all(|c| c.is_ascii_hexdigit()) {
+        return Err("Invalid color. Use hex like #RRGGBB".into());
+    }
+    let rgb = u32::from_str_radix(s, 16).map_err(|_| "Invalid color".to_string())?;
+    // Convert RGB (RRGGBB) to COLORREF (0x00BBGGRR)
+    let r = (rgb >> 16) & 0xFF;
+    let g = (rgb >> 8) & 0xFF;
+    let b = rgb & 0xFF;
+    // COLORREF expects 0x00BBGGRR, so place R in low byte, G in next, B in high
+    Ok((r) | (g << 8) | (b << 16))
+}
+
 #[derive(Debug, Copy, Clone)]
 pub enum CornerPreference {
     Default,
@@ -40,6 +63,10 @@ pub struct Cli {
     pub size: Option<Size>,
     #[arg(short = 'c', long = "corner", value_parser = parse_corner, help = "Set DWM window corner preference (DEFAULT|DONOTROUND|ROUND|ROUNDSMALL or 0-3)")]
     pub corner: Option<CornerPreference>,
+    #[arg(short = 'b', long = "border", value_parser = parse_on_off, help = "Toggle window border on/off (on|off)")]
+    pub border: Option<bool>,
+    #[arg(short = 'C', long = "border-color", value_parser = parse_color, help = "Set border color as hex (#RRGGBB), Windows 11 only")]
+    pub border_color: Option<u32>,
 }
 
 #[derive(Debug, Copy, Clone, Parser, Default)]

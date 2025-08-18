@@ -6,6 +6,8 @@ A simple window resize utility for Windows with DWM window corner customization 
 
 - **Window Resizing**: Resize windows by title or executable path
 - **Corner Customization**: Control window corner rounding (Windows 11+)
+- **Border Control**: Toggle window borders on/off for frameless windows
+- **Border Color**: Customize border colors (Windows 11+)
 - **Multiple Resolution Formats**: Support for various resolution formats and presets
 - **Flexible Filtering**: Filter windows by title content or executable path
 
@@ -40,9 +42,43 @@ winresz -t "notepad" -c ROUNDSMALL
 winresz -t "notepad" -c DEFAULT
 ```
 
+### Window Border Control
+
+Toggle window borders on/off using the `--border` or `-b` option:
+
+```bash
+# Remove window border (frameless)
+winresz -t "notepad" -b off
+
+# Add window border
+winresz -t "notepad" -b on
+
+# You can also use true/false or 1/0
+winresz -t "notepad" -b false
+winresz -t "notepad" -b 1
+```
+
+### Border Color Customization (Windows 11+)
+
+Change border color using the `--border-color` option:
+
+```bash
+# Red border
+winresz -t "notepad" --border-color #FF0000
+
+# Blue border
+winresz -t "notepad" --border-color #0000FF
+
+# Black border (less visible)
+winresz -t "notepad" --border-color #000000
+
+# Green border
+winresz -t "notepad" --border-color #00FF00
+```
+
 ### Combined Usage
 
-Resize and set corner preference simultaneously:
+Combine multiple options for comprehensive window customization:
 
 ```bash
 # Resize to 1920x1080 and disable corner rounding
@@ -50,6 +86,15 @@ winresz -t "Windowed Projector" -c DONOTROUND 1920x1080
 
 # Resize to 4K and enable small corner rounding
 winresz -p "vlc.exe" -c ROUNDSMALL 4k
+
+# Frameless window with no corner rounding
+winresz -t "notepad" -b off -c DONOTROUND
+
+# Red border with small rounded corners at HD resolution
+winresz -t "notepad" --border-color #FF0000 -c ROUNDSMALL hd
+
+# Complete customization: frameless, 4K, no corners
+winresz -p "game.exe" -b off -c DONOTROUND 4k
 ```
 
 ## Short Options
@@ -57,14 +102,17 @@ winresz -p "vlc.exe" -c ROUNDSMALL 4k
 - `-t` = `--title-contains`
 - `-p` = `--path-endswith`
 - `-c` = `--corner`
+- `-b` = `--border`
 - `-o` = `--offset`
 
 ```bash
-winresz -t "notepad" -c ROUND 1920x1080
-winresz -p "notepad.exe" -c DONOTROUND fhd
+winresz -t "notepad" -c ROUND -b off 1920x1080
+winresz -p "notepad.exe" -c DONOTROUND --border-color #FF0000 fhd
 ```
 
-## Corner Options
+## Options Reference
+
+### Corner Options
 
 | Option | Value | Description |
 |--------|-------|-------------|
@@ -78,6 +126,19 @@ You can use either the name or numeric value:
 winresz -t "notepad" -c ROUND      # Same as -c 2
 winresz -t "notepad" -c 1          # Same as -c DONOTROUND
 ```
+
+### Border Options
+
+| Option | Description |
+|--------|-------------|
+| `on`, `true`, `1` | Enable window border |
+| `off`, `false`, `0` | Disable window border (frameless) |
+
+### Border Color
+
+- Format: `#RRGGBB` (hex color)
+- Examples: `#FF0000` (red), `#00FF00` (green), `#0000FF` (blue)
+- Windows 11 Build 22000+ required
 
 ## Resolution Formats
 
